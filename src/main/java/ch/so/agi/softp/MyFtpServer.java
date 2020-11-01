@@ -33,6 +33,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.vfsutils.ftpserver.filesystem.VfsAuthenticator;
 import org.vfsutils.ftpserver.filesystem.VfsFileSystemFactory;
+import org.vfsutils.ftpserver.filesystem.VfsFileSystemView;
+import org.vfsutils.ftpserver.filesystem.VfsInfo;
 
 @Component
 public class MyFtpServer {
@@ -56,13 +58,18 @@ public class MyFtpServer {
     private FtpServer ftpServer;
 
     @PostConstruct
-    private void start() throws FileSystemException {
+    private void start() throws FileSystemException, FtpException {
         
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
         UserManager userManager = userManagerFactory.createUserManager();
         
         BaseUser user = new BaseUser();
         user.setName("anonymous"); // Do not setPassword for anonymous login. Home directory is set in vfs.
+        
+//        BaseUser user = new BaseUser();
+//        user.setName("demo");
+//        user.setPassword("demo");
+
 
         try {
             userManager.save(user);
@@ -98,21 +105,22 @@ public class MyFtpServer {
         vfsAuthentificator.setVfsType("virtual");
 //        vfsAuthentificator.setVfsShare(true);
         
-        
-        try {
-            vfsAuthentificator.authenticate(ftpUserHetzner, ftpPwdHetzner, "/");
-        } catch (FileSystemException e) {
-            log.error("could not connect to vfs: ", e);
-            e.printStackTrace();
-            return;
-        }
-
+//        VfsInfo vsfInfo;
+//        try {
+//            vsfInfo = vfsAuthentificator.authenticate(ftpUserHetzner, ftpPwdHetzner, "/");
+//        } catch (FileSystemException e) {
+//            log.error("could not connect to vfs: ", e);
+//            e.printStackTrace();
+//            return;
+//        }
         vfsFileSystemFactory.setAuthenticator(vfsAuthentificator);
+        
         
         BaseUser vfsUser = new BaseUser();
         vfsUser.setName(ftpUserHetzner);
         vfsUser.setPassword(ftpPwdHetzner);
         vfsUser.setHomeDirectory("/");
+
         
 //        FileSystemOptions opts = new FileSystemOptions();
 //        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
