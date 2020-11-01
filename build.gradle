@@ -7,10 +7,13 @@ plugins {
 apply from: "gradle/versioning.gradle"
 
 group = 'ch.so.agi'
-sourceCompatibility = '11'
+sourceCompatibility = '8'
 
 repositories {
 	mavenCentral()
+    flatDir {
+       dirs 'libs'
+    }
 }
 
 dependencies {
@@ -19,6 +22,11 @@ dependencies {
 	
 	implementation 'org.apache.ftpserver:ftplet-api:1.1.1'
     implementation 'org.apache.ftpserver:ftpserver-core:1.1.1'
+    //implementation 'vfsutils-ftpserver-0.2.0-SNAPSHOT' // http://vfs-utils.sourceforge.net/#ftpserverindex.html 
+    compile fileTree(include: ["*.jar"], dir: "libs")
+    compile group: 'org.apache.commons', name: 'commons-vfs2', version: '2.6.0'
+    compile group: 'commons-net', name: 'commons-net', version: '3.7.2'
+
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
