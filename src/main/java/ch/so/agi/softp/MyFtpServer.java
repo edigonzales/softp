@@ -89,25 +89,24 @@ public class MyFtpServer {
         }
         vfsFileSystemFactory.setAuthenticator(vfsAuthentificator);
         
-//        vfsUser.setHomeDirectory("ftp://anonymous:foo.ch@ftp.swfwmd.state.fl.us");
-//        try {
-//            vfsFileSystemFactory.createFileSystemView(vfsUser);
-//        } catch (FtpException e) {
-//            log.error("could not create vfs file system", e);
-//            e.printStackTrace();
-//            return;
-//        }
-//
-//        factory.setFileSystem(vfsFileSystemFactory);
-//         
-//        FtpServer server = factory.createServer();
-//        
-//        try {
-//            server.start();
-//        } catch (FtpException e) {
-//            log.error("failed to start ftp server:", e);
-//            return;
-//        }
+        try {
+            vfsFileSystemFactory.createFileSystemView(vfsUser);
+        } catch (FtpException e) {
+            log.error("could not create vfs file system", e);
+            e.printStackTrace();
+            return;
+        }
+
+        factory.setFileSystem(vfsFileSystemFactory);
+         
+        FtpServer server = factory.createServer();
+        
+        try {
+            server.start();
+        } catch (FtpException e) {
+            log.error("failed to start ftp server:", e);
+            return;
+        }
 
 
     }
