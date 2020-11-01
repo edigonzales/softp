@@ -50,16 +50,6 @@ public class MyFtpServer {
             return;
         }
         
-        try {
-            for (String schema: VFS.getManager().getSchemes()) {
-                log.info(schema);
-            }
-        } catch (FileSystemException e2) {
-            e2.printStackTrace();
-        }
-
-        
-        
         ListenerFactory listenerFactory = new ListenerFactory();
         listenerFactory.setPort(2221);
          
@@ -83,7 +73,7 @@ public class MyFtpServer {
         vfsAuthentificator.setVfsRoot("ftp://XXXXXX:YYYYYYY@ftp.infogrips.ch");
         vfsAuthentificator.setVfsType("virtual");
         try {
-            vfsAuthentificator.authenticate("vaso", "vaso123", "/");
+            vfsAuthentificator.authenticate("XXXXX", "YYYYYYY", "/");
         } catch (FileSystemException e) {
             log.error("could not connect to vfs: ", e);
             e.printStackTrace();
