@@ -76,23 +76,25 @@ public class MyFtpServer {
         // http://vfs-utils.sourceforge.net/ftpserver/apidocs/index.html
         VfsFileSystemFactory vfsFileSystemFactory = new VfsFileSystemFactory();
         BaseUser vfsUser = new BaseUser();
-        vfsUser.setName("vaso");
-        vfsUser.setPassword("vaso123");
+        vfsUser.setName("XXXXXX");
+        vfsUser.setPassword("YYYYYY");
         
         VfsAuthenticator vfsAuthentificator = new VfsAuthenticator();
-        vfsAuthentificator.setVfsRoot("ftp://vaso:vaso123@ftp.infogrips.ch");
+        vfsAuthentificator.setVfsRoot("ftp://XXXXXX:YYYYYYY@ftp.infogrips.ch");
         vfsAuthentificator.setVfsType("virtual");
         try {
             vfsAuthentificator.authenticate("vaso", "vaso123", "/");
         } catch (FileSystemException e) {
+            log.error("could not connect to vfs: ", e);
             e.printStackTrace();
+            return;
         }
         vfsFileSystemFactory.setAuthenticator(vfsAuthentificator);
         
         try {
             vfsFileSystemFactory.createFileSystemView(vfsUser);
         } catch (FtpException e) {
-            log.error("could not create vfs file system", e);
+            log.error("could not create vfs file system: ", e);
             e.printStackTrace();
             return;
         }
@@ -104,7 +106,7 @@ public class MyFtpServer {
         try {
             server.start();
         } catch (FtpException e) {
-            log.error("failed to start ftp server:", e);
+            log.error("failed to start ftp server: ", e);
             return;
         }
 
