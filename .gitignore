@@ -308,3 +308,7 @@ gradle-app.setting
 **/build/
 
 # End of https://www.toptal.com/developers/gitignore/api/maven,gradle,java,groovy,windows,linux,macos,intellij+all,netbeans,eclipse
+
+!libs/vfsutils-ftpserver-0.2.0-SNAPSHOT.jar
+!libs/vfsutils-utils-0.2.0-SNAPSHOT.jar
+
