@@ -35,6 +35,7 @@ import org.vfsutils.ftpserver.filesystem.VfsAuthenticator;
 import org.vfsutils.ftpserver.filesystem.VfsFileSystemFactory;
 import org.vfsutils.ftpserver.filesystem.VfsFileSystemView;
 import org.vfsutils.ftpserver.filesystem.VfsInfo;
+import org.vfsutils.ftpserver.usermanager.VfsUser;
 
 @Component
 public class MyFtpServer {
@@ -59,94 +60,44 @@ public class MyFtpServer {
 
     @PostConstruct
     private void start() throws FileSystemException, FtpException {
-        
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
         UserManager userManager = userManagerFactory.createUserManager();
         
         BaseUser user = new BaseUser();
-        user.setName("anonymous"); // Do not setPassword for anonymous login. Home directory is set in vfs.
-        
-//        BaseUser user = new BaseUser();
-//        user.setName("demo");
-//        user.setPassword("demo");
-
-
-        try {
-            userManager.save(user);
-        } catch (FtpException e) {
-            log.warn("init user fail:", e);
-            return;
-        }
-        
-        
-
+        user.setName("anonymous"); 
+        userManager.save(user);
         
         ListenerFactory listenerFactory = new ListenerFactory();
         listenerFactory.setPort(2221);
          
         ConnectionConfigFactory connectionConfigFactory = new ConnectionConfigFactory();
         connectionConfigFactory.setAnonymousLoginEnabled(true);
-        connectionConfigFactory.setMaxLogins(ftpAnonMaxLogin);
-        connectionConfigFactory.setMaxThreads(ftpAnonMaxThreads);
 
         FtpServerFactory factory = new FtpServerFactory();
         factory.setConnectionConfig(connectionConfigFactory.createConnectionConfig());
         factory.setUserManager(userManager);
         factory.addListener("default", listenerFactory.createListener());
-        
-        // Create virtual file system (external ftp server)
-        // http://vfs-utils.sourceforge.net/ftpserver/apidocs/index.html
-        
+
         VfsFileSystemFactory vfsFileSystemFactory = new VfsFileSystemFactory();
-        
         VfsAuthenticator vfsAuthentificator = new VfsAuthenticator();
-        vfsAuthentificator.setVfsRoot("ftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner);
-//        vfsAuthentificator.setVfsRoot("ftp://"+ftpServerHetzner);
+        vfsAuthentificator.setVfsRoot("ftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner+"/");        
+//        vfsAuthentificator.setVfsRoot("sftp://" + ftpServerHetzner);
         vfsAuthentificator.setVfsType("virtual");
-//        vfsAuthentificator.setVfsShare(true);
         
-//        VfsInfo vsfInfo;
-//        try {
-//            vsfInfo = vfsAuthentificator.authenticate(ftpUserHetzner, ftpPwdHetzner, "/");
-//        } catch (FileSystemException e) {
-//            log.error("could not connect to vfs: ", e);
-//            e.printStackTrace();
-//            return;
-//        }
         vfsFileSystemFactory.setAuthenticator(vfsAuthentificator);
-        
-        
-        BaseUser vfsUser = new BaseUser();
-        vfsUser.setName(ftpUserHetzner);
-        vfsUser.setPassword(ftpPwdHetzner);
-        vfsUser.setHomeDirectory("/");
 
+//        BaseUser vfsUser = new BaseUser();
+//        vfsUser.setName(ftpUserHetzner);
+//        vfsUser.setPassword(ftpPwdHetzner);
+//        vfsUser.setHomeDirectory("/");
+//        vfsUser.setEnabled(true);
+//        vfsFileSystemFactory.createFileSystemView(vfsUser);
         
-//        FileSystemOptions opts = new FileSystemOptions();
-//        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
-//        SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
-//        SftpFileSystemConfigBuilder.getInstance().setConnectTimeoutMillis(opts, 30000);
-        
-        try {
-            vfsFileSystemFactory.createFileSystemView(vfsUser);
-        } catch (FtpException e) {
-            log.error("could not create vfs file system: ", e);
-            e.printStackTrace();
-            return;
-        }
-
         factory.setFileSystem(vfsFileSystemFactory);
-         
+        
         FtpServer server = factory.createServer();
+        server.start();
         
-        try {
-            server.start();
-        } catch (FtpException e) {
-            log.error("failed to start ftp server: ", e);
-            return;
-        }
-        
-
 //        FileSystemOptions opts = new FileSystemOptions();
 //        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
 //        SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
@@ -154,15 +105,13 @@ public class MyFtpServer {
 //        log.info("fubar0");
 //
 //        FileSystemManager fsManager = VFS.getManager();
-//        FileObject localFileObject=fsManager.resolveFile("sftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner+"/");
+//        FileObject localFileObject=fsManager.resolveFile("ftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner+"/");
 //        FileObject[] children = localFileObject.getChildren();
 //        log.info("fubar1");
 //        for ( int i = 0; i < children.length; i++ ){
 //            System.out.println( children[ i ].getName().getBaseName() );
-//        }
-        
+//        }  
     }
-    
     
     @PreDestroy
     private void stop() {
