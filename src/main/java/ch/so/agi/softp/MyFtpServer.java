@@ -86,7 +86,7 @@ public class MyFtpServer {
         VfsAuthenticator vfsAuthentificator = new VfsAuthenticator();
         // sftp does not work on macos (vfs2)
         // common-vfs2 v2.7.0 hangs after "Authentication succeeded (password)." Use v2.4.1 instead.
-        // pure ftp:// seems to be faster
+        // pure ftp:// seems to be faster (mmmh, vielleicht auch nicht)
         vfsAuthentificator.setVfsRoot("sftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner);        
         vfsAuthentificator.setVfsType("virtual");
         
