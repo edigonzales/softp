@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.vfsutils.ftpserver.filesystem.ShallowReadOnlyVfsFtpFileFactory;
 import org.vfsutils.ftpserver.filesystem.VfsAuthenticator;
 import org.vfsutils.ftpserver.filesystem.VfsFileSystemFactory;
 import org.vfsutils.ftpserver.filesystem.VfsFileSystemView;
@@ -65,6 +66,9 @@ public class MyFtpServer {
         
         BaseUser user = new BaseUser();
         user.setName("anonymous"); 
+//        user.setName("demo");
+//        user.setPassword("demo");
+        user.setHomeDirectory("/");
         userManager.save(user);
         
         ListenerFactory listenerFactory = new ListenerFactory();
@@ -80,19 +84,15 @@ public class MyFtpServer {
 
         VfsFileSystemFactory vfsFileSystemFactory = new VfsFileSystemFactory();
         VfsAuthenticator vfsAuthentificator = new VfsAuthenticator();
-        vfsAuthentificator.setVfsRoot("ftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner+"/");        
-//        vfsAuthentificator.setVfsRoot("sftp://" + ftpServerHetzner);
+        // sftp does not work on macos (vfs2)
+        // common-vfs2 v2.7.0 hangs after "Authentication succeeded (password)." Use v2.4.1 instead.
+        // pure ftp:// seems to be faster
+        vfsAuthentificator.setVfsRoot("sftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner);        
         vfsAuthentificator.setVfsType("virtual");
         
         vfsFileSystemFactory.setAuthenticator(vfsAuthentificator);
-
-//        BaseUser vfsUser = new BaseUser();
-//        vfsUser.setName(ftpUserHetzner);
-//        vfsUser.setPassword(ftpPwdHetzner);
-//        vfsUser.setHomeDirectory("/");
-//        vfsUser.setEnabled(true);
-//        vfsFileSystemFactory.createFileSystemView(vfsUser);
-        
+        vfsFileSystemFactory.setFileFactory(new ShallowReadOnlyVfsFtpFileFactory());
+                
         factory.setFileSystem(vfsFileSystemFactory);
         
         FtpServer server = factory.createServer();
@@ -105,7 +105,7 @@ public class MyFtpServer {
 //        log.info("fubar0");
 //
 //        FileSystemManager fsManager = VFS.getManager();
-//        FileObject localFileObject=fsManager.resolveFile("ftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner+"/");
+//        FileObject localFileObject=fsManager.resolveFile("sftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner+"/");
 //        FileObject[] children = localFileObject.getChildren();
 //        log.info("fubar1");
 //        for ( int i = 0; i < children.length; i++ ){
