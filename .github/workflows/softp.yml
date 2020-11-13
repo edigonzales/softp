@@ -4,6 +4,11 @@ on: [push]
 
 jobs:
   build:
+    env:
+        DOCKER_ACCOUNT: sogis
+        DOCKER_REPO: softp
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}        
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -18,24 +23,26 @@ jobs:
         with:
           java-version: 11
       - name: Build with Gradle
-        run: ./gradlew -s clean build pullDockerImage buildDockerImage pushDockerImages 
+        run: ./gradlew clean build 
         env:
           ftpServerHetzner: ${{secrets.FTPSERVERHETZNER}}
           ftpUserHetzner: ${{secrets.FTPUSERHETZNER}}
           ftpPwdHetzner: ${{secrets.FTPPWDHETZNER}}
       - name: ls
-        #run: ./gradlew clean build pullDockerImage dockerTest --fail-fast -x test
         run: ls -la build/libs/
         env:
           BUILD_NUMBER: ${{ env.GITHUB_RUN_NUMBER }}
-      # - name: Push docker image
-      #   run: |
-      #     export CI_JOB_TIMESTAMP=$(date +%Y%m%dT%H%M%S)
-      #     echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-      #     docker images
-      #     ./gradlew pushDockerImages
-      #   env:
-      #     DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      #     DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
-      #     DOCKER_ACCOUNT: sogis
-      #     DOCKER_REPO: softp
+      - name: Build docker image
+        run: |
+          export CI_JOB_TIMESTAMP=$(date +%Y%m%dT%H%M%S)
+          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+          docker pull $DOCKER_ACCOUNT/$DOCKER_REPO:latest
+          docker build -t $DOCKER_ACCOUNT/$DOCKER_REPO:1.0.$GITHUB_RUN_NUMBER .
+          docker build -t $DOCKER_ACCOUNT/$DOCKER_REPO:latest .
+      - name: Push docker image
+        run: |
+          export CI_JOB_TIMESTAMP=$(date +%Y%m%dT%H%M%S)
+          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+          docker images
+          docker push $DOCKER_ACCOUNT/$DOCKER_REPO:1.0.$GITHUB_RUN_NUMBER
+          docker push $DOCKER_ACCOUNT/$DOCKER_REPO:latest

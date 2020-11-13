@@ -47,6 +47,11 @@ bootJar {
     layered()
 }
 
+
+// Funktioniert nicht mit Java 11
+// https://github.com/bmuschko/gradle-docker-plugin/issues/863
+
+/*
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
@@ -56,7 +61,6 @@ import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerLogsContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer.ExposedPort
-import java.text.SimpleDateFormat
 
 docker {
     registryCredentials {
@@ -97,7 +101,9 @@ task pushDockerImages() {
         tasks.findAll { task -> task.name.startsWith('pushDockerImage_') }
     }    
 }
+*/
 
+import java.text.SimpleDateFormat
 
 def getCheckedOutGitCommitHash() {
     'git log -1 --pretty=%H'.execute().text.trim()
