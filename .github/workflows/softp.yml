@@ -18,7 +18,7 @@ jobs:
         with:
           java-version: 11
       - name: Build with Gradle
-        run: ./gradlew -i clean build pullDockerImage buildDockerImage pushDockerImages 
+        run: ./gradlew -s clean build pullDockerImage buildDockerImage pushDockerImages 
         env:
           ftpServerHetzner: ${{secrets.FTPSERVERHETZNER}}
           ftpUserHetzner: ${{secrets.FTPUSERHETZNER}}
