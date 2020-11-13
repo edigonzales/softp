@@ -1,38 +1,38 @@
 plugins {
-	id 'org.springframework.boot' version '2.3.5.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.3.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+    id "com.bmuschko.docker-remote-api" version "6.1.2"
 }
 
 apply from: "gradle/versioning.gradle"
 
 group = 'ch.so.agi'
-sourceCompatibility = '8'
+sourceCompatibility = '11'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
     flatDir {
        dirs 'libs'
     }
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	
-	implementation 'org.apache.ftpserver:ftplet-api:1.1.1'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    implementation 'org.apache.ftpserver:ftplet-api:1.1.1'
     implementation 'org.apache.ftpserver:ftpserver-core:1.1.1'
     implementation name: 'vfsutils-ftpserver-0.2.1' // http://vfs-utils.sourceforge.net/#ftpserverindex.html 
     implementation name: 'vfsutils-utils-0.2.0-SNAPSHOT' // http://vfs-utils.sourceforge.net/#ftpserverindex.html 
-    //compile fileTree(include: ["*.jar"], dir: "libs")
     compile group: 'org.apache.commons', name: 'commons-vfs2', version: '2.4.1'
     compile group: 'commons-net', name: 'commons-net', version: '3.7.2'
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 }
 
 test {
@@ -47,7 +47,57 @@ bootJar {
     layered()
 }
 
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerLogsContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer.ExposedPort
 import java.text.SimpleDateFormat
+
+docker {
+    registryCredentials {
+        username = System.env.DOCKER_USERNAME
+        password = System.env.DOCKER_PASSWORD
+    }
+}
+
+task pullDockerImage(type: DockerPullImage) {
+    description = "Pull docker image."
+    image = "sogis/softp:latest"
+}
+
+task buildDockerImage(type: DockerBuildImage) {
+    description = "Build docker image."
+    inputDir = project.rootDir
+    cacheFrom.add("sogis/softp:latest")    
+    images.add("sogis/softp:latest:"+version.toString())
+    images.add("sogis/softp:latest:latest")
+    labels = ["softp.created": new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
+            "softp.git_commit": getCheckedOutGitCommitHash(), 
+            "softp.build": version.toString()]
+}
+
+def tags = ["latest", version]
+
+tags.each { tag ->
+    def imageTag = tag.toString()
+    task "pushDockerImage_$imageTag"(type: DockerPushImage) {
+        description = "Push docker image to hub.docker.com: $imageTag"
+        images = ["sogis/softp:$imageTag"]
+    }
+}
+
+task pushDockerImages() {
+    description = "Push docker images to hub.docker.com."
+    dependsOn {
+        tasks.findAll { task -> task.name.startsWith('pushDockerImage_') }
+    }    
+}
+
 
 def getCheckedOutGitCommitHash() {
     'git log -1 --pretty=%H'.execute().text.trim()

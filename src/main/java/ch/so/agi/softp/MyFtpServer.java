@@ -7,23 +7,12 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileSystemOptions;
-import org.apache.commons.vfs2.VFS;
-import org.apache.commons.vfs2.impl.StandardFileSystemManager;
-import org.apache.commons.vfs2.provider.ftp.FtpFileSystemConfigBuilder;
-import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
 import org.apache.ftpserver.ConnectionConfigFactory;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
-import org.apache.ftpserver.ftplet.FileSystemFactory;
-import org.apache.ftpserver.ftplet.FileSystemView;
 import org.apache.ftpserver.ftplet.FtpException;
-import org.apache.ftpserver.ftplet.User;
 import org.apache.ftpserver.ftplet.UserManager;
-import org.apache.ftpserver.ftplet.Authority;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.ftpserver.usermanager.impl.BaseUser;
@@ -34,9 +23,6 @@ import org.springframework.stereotype.Component;
 import org.vfsutils.ftpserver.filesystem.ShallowReadOnlyVfsFtpFileFactory;
 import org.vfsutils.ftpserver.filesystem.VfsAuthenticator;
 import org.vfsutils.ftpserver.filesystem.VfsFileSystemFactory;
-import org.vfsutils.ftpserver.filesystem.VfsFileSystemView;
-import org.vfsutils.ftpserver.filesystem.VfsInfo;
-import org.vfsutils.ftpserver.usermanager.VfsUser;
 
 @Component
 public class MyFtpServer {
@@ -66,8 +52,6 @@ public class MyFtpServer {
         
         BaseUser user = new BaseUser();
         user.setName("anonymous"); 
-//        user.setName("demo");
-//        user.setPassword("demo");
         user.setHomeDirectory("/");
         userManager.save(user);
         
@@ -101,13 +85,10 @@ public class MyFtpServer {
 //        FileSystemOptions opts = new FileSystemOptions();
 //        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
 //        SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
-//
-//        log.info("fubar0");
-//
+        
 //        FileSystemManager fsManager = VFS.getManager();
 //        FileObject localFileObject=fsManager.resolveFile("sftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner+"/");
 //        FileObject[] children = localFileObject.getChildren();
-//        log.info("fubar1");
 //        for ( int i = 0; i < children.length; i++ ){
 //            System.out.println( children[ i ].getName().getBaseName() );
 //        }  

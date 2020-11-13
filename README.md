@@ -1,6 +1,7 @@
 # softp
 
 ## todo
+- docs (readme and fe)
 - ask about sources of `vfsutils-ftpserver` and `vfsutils-utils`
 - ask to put these libs on mavencentral
 - ~~config user. e.g. max connections / explicit read only etc. etc.~~
