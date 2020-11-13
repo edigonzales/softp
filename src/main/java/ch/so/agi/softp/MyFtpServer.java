@@ -36,7 +36,10 @@ public class MyFtpServer {
     
     @Value("${app.ftpPwdHetzner}")    
     private String ftpPwdHetzner;
-    
+        
+    @Value("${app.ftpPort}")    
+    private int ftpPort;
+
     @Value("${app.ftpAnonMaxLogin}")    
     private int ftpAnonMaxLogin;
 
@@ -56,7 +59,7 @@ public class MyFtpServer {
         userManager.save(user);
         
         ListenerFactory listenerFactory = new ListenerFactory();
-        listenerFactory.setPort(2221);
+        listenerFactory.setPort(ftpPort);
          
         ConnectionConfigFactory connectionConfigFactory = new ConnectionConfigFactory();
         connectionConfigFactory.setAnonymousLoginEnabled(true);
@@ -71,7 +74,7 @@ public class MyFtpServer {
         // sftp does not work on macos (vfs2)
         // common-vfs2 v2.7.0 hangs after "Authentication succeeded (password)." Use v2.4.1 instead.
         // pure ftp:// seems to be faster (mmmh, vielleicht auch nicht)
-        vfsAuthentificator.setVfsRoot("sftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner);        
+        vfsAuthentificator.setVfsRoot("ftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner);        
         vfsAuthentificator.setVfsType("virtual");
         
         vfsFileSystemFactory.setAuthenticator(vfsAuthentificator);
