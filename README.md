@@ -1,9 +1,9 @@
 # softp
 
 ## about
-`Softp` ist ein FTP-Proxy für (Geo-)Daten, die auf einem externen FTP gespeichert sind. Externe (vertrauenswürdige) FTP erlauben meistens keinen `anonymous`-Zugang, um selber nicht als Spamschleuder zu gelten. Durch den Proxy kann auch eine "so.ch"-URL verwendet werden. Der externe FTP wird als virtuelles Filesystem eingebunden.
+_Softp_ ist ein FTP-Proxy für (Geo-)Daten, die auf einem externen FTP gespeichert sind. Externe (vertrauenswürdige) FTP erlauben meistens keinen `anonymous`-Zugang, um selber nicht als Spamschleuder zu gelten. Durch den Proxy kann auch eine "so.ch"-URL verwendet werden. Der externe FTP wird als virtuelles Filesystem eingebunden.
 
-Verwendet wird [`Apache FtpServer`](https://mina.apache.org/ftpserver-project/) des `Apache Mina`-Projektes.
+Verwendet wird [_Apache FtpServer_](https://mina.apache.org/ftpserver-project/) des _Apache Mina_-Projektes.
 
 ## hints
 - Unter macOS scheint das virtuelle Filesystem nicht zu funktionieren, falls es mit "sftp://" eingebunden wird. Mit "ftp://" funktioniert es problemlos.
