@@ -9,6 +9,8 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.ftpserver.ConnectionConfigFactory;
+import org.apache.ftpserver.DataConnectionConfiguration;
+import org.apache.ftpserver.DataConnectionConfigurationFactory;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.FtpException;
@@ -60,6 +62,10 @@ public class MyFtpServer {
         
         ListenerFactory listenerFactory = new ListenerFactory();
         listenerFactory.setPort(ftpPort);
+        
+        DataConnectionConfigurationFactory dataConfigFactory = new DataConnectionConfigurationFactory();
+        dataConfigFactory.setPassivePorts("20100-20150");
+        listenerFactory.setDataConnectionConfiguration(dataConfigFactory.createDataConnectionConfiguration());
          
         ConnectionConfigFactory connectionConfigFactory = new ConnectionConfigFactory();
         connectionConfigFactory.setAnonymousLoginEnabled(true);
@@ -74,7 +80,7 @@ public class MyFtpServer {
         // sftp does not work on macos (vfs2)
         // common-vfs2 v2.7.0 hangs after "Authentication succeeded (password)." Use v2.4.1 instead.
         // pure ftp:// seems to be faster (mmmh, vielleicht auch nicht)
-        vfsAuthentificator.setVfsRoot("ftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner);        
+        vfsAuthentificator.setVfsRoot("sftp://"+ftpUserHetzner+":"+ftpPwdHetzner+"@"+ftpServerHetzner);        
         vfsAuthentificator.setVfsType("virtual");
         
         vfsFileSystemFactory.setAuthenticator(vfsAuthentificator);
